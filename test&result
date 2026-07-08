@@ -5,13 +5,23 @@ Sub HighlightMatchingInvoices()
     Dim i As Long, j As Long
     Dim valA As String, valB As String
     Dim matchCount As Long
+    Dim pathA As Variant, pathB As Variant
 
-    ' ===== تنظیمات: اسم فایل‌ها و شیت‌ها رو اینجا عوض کن =====
-    Set wbA = Workbooks("a.xlsx")          ' اسم فایل A
-    Set wbB = Workbooks("b.xlsx")          ' اسم فایل B
-    Set wsA = wbA.Sheets("Sheet1")         ' اسم شیت در فایل A
-    Set wsB = wbB.Sheets("Sheet1")         ' اسم شیت در فایل B
-    ' ==========================================================
+    ' ===== انتخاب فایل A =====
+    MsgBox "لطفاً فایل اول (A) رو انتخاب کنید", vbInformation
+    pathA = Application.GetOpenFilename("Excel Files (*.xlsx; *.xlsm; *.xls), *.xlsx; *.xlsm; *.xls", , "انتخاب فایل A")
+    If pathA = False Then Exit Sub
+    Set wbA = Workbooks.Open(pathA)
+
+    ' ===== انتخاب فایل B =====
+    MsgBox "حالا فایل دوم (B) رو انتخاب کنید", vbInformation
+    pathB = Application.GetOpenFilename("Excel Files (*.xlsx; *.xlsm; *.xls), *.xlsx; *.xlsm; *.xls", , "انتخاب فایل B")
+    If pathB = False Then Exit Sub
+    Set wbB = Workbooks.Open(pathB)
+
+    ' ===== شیت‌ها: پیش‌فرض شیت اول هر فایل =====
+    Set wsA = wbA.Sheets(1)
+    Set wsB = wbB.Sheets(1)
 
     lastRowA = wsA.Cells(wsA.Rows.Count, "B").End(xlUp).Row
     lastRowB = wsB.Cells(wsB.Rows.Count, "B").End(xlUp).Row
