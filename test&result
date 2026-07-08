@@ -1,0 +1,36 @@
+Sub HighlightMatchingInvoices()
+    Dim wbA As Workbook, wbB As Workbook
+    Dim wsA As Worksheet, wsB As Worksheet
+    Dim lastRowA As Long, lastRowB As Long
+    Dim i As Long, j As Long
+    Dim valA As String, valB As String
+    Dim matchCount As Long
+
+    ' ===== تنظیمات: اسم فایل‌ها و شیت‌ها رو اینجا عوض کن =====
+    Set wbA = Workbooks("a.xlsx")          ' اسم فایل A
+    Set wbB = Workbooks("b.xlsx")          ' اسم فایل B
+    Set wsA = wbA.Sheets("Sheet1")         ' اسم شیت در فایل A
+    Set wsB = wbB.Sheets("Sheet1")         ' اسم شیت در فایل B
+    ' ==========================================================
+
+    lastRowA = wsA.Cells(wsA.Rows.Count, "B").End(xlUp).Row
+    lastRowB = wsB.Cells(wsB.Rows.Count, "B").End(xlUp).Row
+
+    matchCount = 0
+
+    For i = 1 To lastRowA
+        valA = Trim(wsA.Cells(i, "B").Value)
+        If valA <> "" Then
+            For j = 1 To lastRowB
+                valB = Trim(wsB.Cells(j, "B").Value)
+                If valB <> "" And valA = valB Then
+                    wsA.Cells(i, "B").Font.Color = RGB(255, 0, 0)
+                    wsB.Cells(j, "B").Font.Color = RGB(255, 0, 0)
+                    matchCount = matchCount + 1
+                End If
+            Next j
+        End If
+    Next i
+
+    MsgBox matchCount & " صورتحساب مشترک پیدا و قرمز شد.", vbInformation
+End Sub
