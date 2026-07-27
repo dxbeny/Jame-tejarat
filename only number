@@ -1,0 +1,25 @@
+Sub KeepOnlyNumbersInSelection()
+
+    Dim cell As Range
+    Dim txt As String
+    Dim result As String
+    Dim i As Long
+    Dim ch As String
+
+    For Each cell In Selection
+        txt = CStr(cell.Value)
+        result = ""
+
+        For i = 1 To Len(txt)
+            ch = Mid(txt, i, 1)
+            If ch Like "#" Then
+                result = result & ch
+            End If
+        Next i
+
+        cell.Value = result
+    Next cell
+
+    MsgBox "Done!"
+
+End Sub
