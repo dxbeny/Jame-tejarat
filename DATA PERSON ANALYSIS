@@ -1,0 +1,74 @@
+Sub ExtractData()
+    Dim ws As Worksheet
+    Dim lastRow As Long, i As Long
+    Dim cellValue As String
+    Dim regex As Object
+    Dim matches As Object
+    Dim rowsToDelete As Collection
+    
+    Set ws = ActiveSheet
+    lastRow = ws.Cells(ws.Rows.Count, "B").End(xlUp).Row
+    
+    Set regex = CreateObject("VBScript.RegExp")
+    regex.Global = True
+    Set rowsToDelete = New Collection
+    
+    For i = 1 To lastRow
+        cellValue = Trim(ws.Cells(i, "B").Value)
+        If cellValue = "" Then GoTo NextRow
+        
+        Dim nationalCode As String, phone As String, personName As String
+        nationalCode = "": phone = "": personName = ""
+        
+        regex.Pattern = "\d+"
+        Set matches = regex.Execute(cellValue)
+        
+        Dim m As Object
+        For Each m In matches
+            If Len(m.Value) = 10 Then
+                nationalCode = m.Value
+            ElseIf Len(m.Value) = 11 Then
+                phone = m.Value
+            End If
+        Next m
+        
+        regex.Pattern = "[\u0600-\u06FF]+"
+        Set matches = regex.Execute(cellValue)
+        
+        Dim wordsArr() As String
+        Dim cnt As Long
+        cnt = 0
+        
+        If matches.Count > 0 Then
+            ReDim wordsArr(matches.Count - 1)
+            For Each m In matches
+                wordsArr(cnt) = m.Value
+                cnt = cnt + 1
+            Next m
+            personName = Join(wordsArr, " ")
+        End If
+        
+        ' G = کد ملی ، F = اسم ، E = شماره تلفن
+        ws.Cells(i, "G").Value = "'" & nationalCode
+        ws.Cells(i, "F").Value = personName
+        ws.Cells(i, "E").Value = "'" & phone
+        
+        If personName = "" Or nationalCode = "" Or phone = "" Then
+            rowsToDelete.Add i
+        End If
+        
+NextRow:
+    Next i
+    
+    Dim j As Long
+    Dim delCount As Long
+    delCount = 0
+    For j = rowsToDelete.Count To 1 Step -1
+        ws.Rows(rowsToDelete(j)).Delete
+        delCount = delCount + 1
+    Next j
+    
+    MsgBox "تمام شد!" & vbNewLine & _
+           "تعداد ردیف‌های بررسی شده: " & lastRow & vbNewLine & _
+           "تعداد ردیف‌های ناقص حذف شده: " & delCount, vbInformation
+End Sub
